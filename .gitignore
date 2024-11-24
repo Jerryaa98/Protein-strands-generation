@@ -1,0 +1,52 @@
+# Compiled source files
+*.o
+*.a
+*.so
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+.env
+venv/
+__pycache__/
+
+# Data files
+*.csv
+*.pdf
+*.pth
+*.pickle
+*.npy
+*.npyc
+*.h5
+*.hdf5
+*.mat
+
+# Model checkpoints and logs
+**/*.ckpt
+**/*.pth
+**/*.pth.tar
+**/*.pt
+**/*.log
+**/*.out
+**/*.err
+
+# System files
+.DS_Store
+Thumbs.db
+*.bak
+*.swp
+*.tmp
+*.DS_Store
+Desktop.ini
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.sln
+*.sln.docstates
+*.slnx
+*.slnx.user
