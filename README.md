@@ -7,5 +7,5 @@ week 1:
 - Ran it on the Ecod Database
 - Generated sample sequences
 - visualized the results
-![3dProjection.mp4](3dProjection.mp4)
+![3dProjection.gif](3dProjection.gif)
 ![2dProjection.png](2dProjection.png)
