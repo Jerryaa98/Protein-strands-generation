@@ -2,6 +2,8 @@ from huggingface_hub import login
 from esm.models.esm3 import ESM3
 from esm.sdk.api import ESM3InferenceClient, ESMProtein, GenerationConfig
 import csv
+from Bio.PDB import PDBParser
+from Bio.PDB.DSSP import DSSP
 
 import os
 os.makedirs("./generated_sequences", exist_ok=True)
