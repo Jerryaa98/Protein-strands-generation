@@ -68,7 +68,9 @@ def run(args):
 
         # Compute DSSP to get secondary structure
         dssp = md.compute_dssp(traj)
-
+        
+        print(dssp)
+        
         # Initialize a list to hold the beta strands as groups of residues
         beta_strands = []
         current_strand = []
@@ -87,6 +89,8 @@ def run(args):
             beta_strands.append(current_strand)
 
         print(f'{i+2} : {len(beta_strands)} | {n_strands[i]}')
+
+        return 0
 
 
 
