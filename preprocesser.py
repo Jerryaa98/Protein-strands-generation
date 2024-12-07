@@ -78,6 +78,8 @@ def run(args):
         load_pdb_files(data_file, pdb_dir)
 
     ids = os.listdir(pdb_dir)
+    faulty_ids = []
+
     for id in ids:
         id = id.split('.')[0]
         ss_output_file = f"{ss_dir}/{id}.txt"
@@ -91,7 +93,18 @@ def run(args):
             with open(ss_output_file, 'w') as output_file:
                 subprocess.run(command, shell=True, check=True)
         except subprocess.CalledProcessError as e:
+            faulty_ids.append(id)
             print(f"Error executing stride: {e}")
+    # print(faulty_ids)
+
+    # Save faulty IDs to a JSON file
+    fault_file = f"{work_dir}/faulty_ids.json"
+    try:
+        with open(fault_file, 'w') as json_file:
+            json.dump(faulty_ids, json_file, indent=4)
+        print(f"Faulty IDs saved to {fault_file}")
+    except Exception as e:
+        print(f"Error saving faulty IDs: {e}")
 
 
     # save meta/data in json file
