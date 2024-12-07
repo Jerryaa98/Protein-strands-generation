@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import json 
 import time
+import subprocess
 # ECOD ss download link : http://prodata.swmed.edu/ecod/af2_pdb/structure?id=e2iahA3
 def load_pdb_files(data_file, output_dir):
     
@@ -35,7 +36,7 @@ def load_pdb_files(data_file, output_dir):
 
 def get_strands(ss_file):
     residue_indcies = []
-    with os.open(ss_file, 'r') as file:
+    with open(ss_file, 'r') as file:
         for line in file :
             ss_type = line[24]
             index = int(line[17:21].strip())
@@ -87,11 +88,10 @@ def run(args):
         try :
             # cliping the stands
             command = f"stride {pdb_dir}/{id}.pdb | grep '^ASG' >> {ss_output_file}"
-            os.system(command)
-            time.sleep(2)
-        except Exception as e:
-            print(f"Failed to excute dssp : {e} at file {ss_output_file}")
-
+            with open(ss_output_file, 'w') as output_file:
+                subprocess.run(command, shell=True, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing stride: {e}")
 
 
     # save meta/data in json file
@@ -108,14 +108,14 @@ def run(args):
             state = {'id': id, 'seq': seq, 'strands':strands}
             data[id] = state
 
-    with os.open(f'{work_dir}/strands.json','w') as json_file:
+    with open(f'{work_dir}/strands.json','w') as json_file:
         json.dump(data, json_file)
 
 if __name__ == "__main__":
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description="Strands Generation")
     # Add arguments
-    parser.add_argument("--data_file", type=str, help="path for the dataset")
+    parser.add_argument("--data_file", type=str, default='./OMBB_data.csv', help="path for the dataset")
     parser.add_argument("--load_pdb", type=bool, default=False, help='load pdp file using wget or not')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     args = parser.parse_args()
