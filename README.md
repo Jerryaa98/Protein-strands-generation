@@ -9,3 +9,9 @@ week 1:
 - visualized the results
 ![3dProjection.gif](images/3dProjection.gif)
 ![2dProjection.png](images/2dProjection.png)
+
+week 2:
+- Installed DSSP
+- Ran it on ECOD database
+- got secondary structures from the pdb files
+- fetch strands from secondary structure (WIP)
