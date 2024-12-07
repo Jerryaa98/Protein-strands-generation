@@ -3,9 +3,9 @@ import csv
 import os
 import argparse
 import numpy as np
-
-
-# https://files.rcsb.org/download/1AF6.pdb
+import json 
+import time
+# ECOD ss download link : http://prodata.swmed.edu/ecod/af2_pdb/structure?id=e2iahA3
 def load_pdb_files(data_file, output_dir):
     
     assert data_file.endswith('.csv'), 'DataSet file must be csv'
@@ -21,7 +21,7 @@ def load_pdb_files(data_file, output_dir):
     for id in ids:
         # URL of the file
 
-        url = f"https://files.rcsb.org/download/{id}.pdb"
+        url = f"http://prodata.swmed.edu/ecod/af2_pdb/structure?id={id}"
 
         # File to save the downloaded content
         #output_file = f"/root/Biology_project/pdb_files/{id}.pdb"
@@ -33,6 +33,25 @@ def load_pdb_files(data_file, output_dir):
         except Exception as e:
             print(f"Failed to download file: {e}")
 
+def get_strands(ss_file):
+    residue_indcies = []
+    with os.open(ss_file, 'r') as file:
+        for line in file :
+            ss_type = line[24]
+            index = int(line[17:21].strip())
+            if ss_type.strip() == 'E' or ss_type.strip() == 'B':
+                residue_indcies.append(index)
+
+    # grouping
+    strands = []
+    current_strand = [residue_indcies[0]]
+    for residue in residue_indcies[1:] :
+        if residue == current_strand[-1] + 1:
+            current_strand.append(residue)
+        else:
+            strands.append(current_strand)
+            current_strand = [residue]
+    return current_strand
 
 def run(args):
 
@@ -58,28 +77,39 @@ def run(args):
         load_pdb_files(data_file, pdb_dir)
 
     ids = os.listdir(pdb_dir)
-    for id in ids[0:1]:
-
+    for id in ids:
+        id = id.split('.')[0]
         ss_output_file = f"{ss_dir}/{id}.txt"
+        
+        if os.path.exists(ss_output_file):
+            continue
+
         try :
             # cliping the stands
-            os.system(f"stride {pdb_dir}/{id} | grep '^ASG' >> {ss_output_file}")
+            command = f"stride {pdb_dir}/{id}.pdb | grep '^ASG' >> {ss_output_file}"
+            os.system(command)
+            time.sleep(2)
         except Exception as e:
             print(f"Failed to excute dssp : {e} at file {ss_output_file}")
-    
-    
-    
-        
 
 
 
-        
+    # save meta/data in json file
+    data = {}
+    with open(data_file, "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            id = row[0]
+            seq = row[2]
 
+            ss_output_file = f"{ss_dir}/{id}.txt"
+            strands = get_strands(ss_output_file)
 
+            state = {'id': id, 'seq': seq, 'strands':strands}
+            data[id] = state
 
-
-
-
+    with os.open(f'{work_dir}/strands.json','w') as json_file:
+        json.dump(data, json_file)
 
 if __name__ == "__main__":
     # Create an ArgumentParser object
