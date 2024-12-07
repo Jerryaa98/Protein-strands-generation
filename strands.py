@@ -46,10 +46,10 @@ def group_residuals(beta_indcies):
         if i == current_strand[-1] + 1:
             current_strand.append(i)
         else:
-            if len(current_strand) > 2 :
+            if len(current_strand) > 0 :
                 strands.append(current_strand)
             current_strand = [i]
-    if len(current_strand) > 2:
+    if len(current_strand) > 0:
         strands.append(current_strand)
     return strands
     
@@ -71,19 +71,15 @@ def run():
         if sec_struct == 'E' or sec_struct == 'B':  # 'E' corresponds to beta-strands
             beta_strands.append(residue)
   
+    for strand in beta_strands:
+        print(strand)
+    return
 
     indcies = [residue[1][1] for residue in beta_strands if residue[0] == 'B']
 
     strands = group_residuals(indcies)
 
     print(len(strands))
-
-        
-
-
-
-
-
 
 
 if __name__ == "__main__":
