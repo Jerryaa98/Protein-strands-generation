@@ -98,13 +98,14 @@ def run(args):
     # print(faulty_ids)
 
     # Save faulty IDs to a JSON file
-    fault_file = f"{work_dir}/faulty_ids.json"
-    try:
-        with open(fault_file, 'w') as json_file:
-            json.dump(faulty_ids, json_file, indent=4)
-        print(f"Faulty IDs saved to {fault_file}")
-    except Exception as e:
-        print(f"Error saving faulty IDs: {e}")
+    if(args.save_faulty_ids == True):
+        fault_file = f"{work_dir}/faulty_ids.json"
+        try:
+            with open(fault_file, 'w') as json_file:
+                json.dump(faulty_ids, json_file, indent=4)
+            print(f"Faulty IDs saved to {fault_file}")
+        except Exception as e:
+            print(f"Error saving faulty IDs: {e}")
 
 
     # save meta/data in json file
@@ -131,5 +132,6 @@ if __name__ == "__main__":
     parser.add_argument("--data_file", type=str, default='./OMBB_data.csv', help="path for the dataset")
     parser.add_argument("--load_pdb", type=bool, default=False, help='load pdp file using wget or not')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
+    parser.add_argument("--save_faulty_ids", type=bool, default=False, help='save faulty pdb file ids in a json file')
     args = parser.parse_args()
     run(args)
