@@ -61,7 +61,6 @@ def run(args):
             protein.to_pdb(f"{generated_sequences}/generation{i}.pdb")
 
         generated_data[id] = state
-        break
 
     with open(f'{generated_sequences_dir}/seq.json','w') as json_file:
         json.dump(generated_data, json_file)
