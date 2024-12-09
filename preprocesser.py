@@ -37,6 +37,7 @@ def load_pdb_files(data_file, output_dir):
 def get_strands(ss_file):
     residue_indcies = []
     with open(ss_file, 'r') as file:
+
         for line in file :
             ss_type = line[24]
             index = int(line[17:21].strip())
@@ -52,7 +53,8 @@ def get_strands(ss_file):
         else:
             strands.append(current_strand)
             current_strand = [residue]
-    return current_strand
+
+    return strands
 
 def run(args):
 
@@ -84,7 +86,7 @@ def run(args):
         id = id.split('.')[0]
         ss_output_file = f"{ss_dir}/{id}.txt"
         
-        if os.path.exists(ss_output_file):
+        if os.path.exists(ss_output_file) and os.path.getsize(ss_output_file) > 0:
             continue
 
         try :
@@ -108,18 +110,27 @@ def run(args):
             print(f"Error saving faulty IDs: {e}")
 
 
+
+
     # save meta/data in json file
     data = {}
     with open(data_file, "r") as file:
+        print(data_file)
         reader = csv.reader(file)
+        i = -1
         for row in reader:
+            i += 1# skip header
+            if i == 0:
+                continue
             id = row[0]
             seq = row[2]
 
             ss_output_file = f"{ss_dir}/{id}.txt"
+            if id in faulty_ids:
+                continue
             strands = get_strands(ss_output_file)
 
-            state = {'id': id, 'seq': seq, 'strands':strands}
+            state = {'seq': seq, 'strands':strands}
             data[id] = state
 
     with open(f'{work_dir}/strands.json','w') as json_file:

@@ -26,6 +26,9 @@ with open("/root/Biology_project/OMBB_data.csv", "r") as file:
         prompts.append(str(prompt))
 prompts = prompts[1:]
 for i, prompt in enumerate(prompts):
+    # generate masks
+    # generate seq foreach mask
+    # visual
     protein = ESMProtein(sequence=prompt)
     # Generate the sequence, then the structure. This will iteratively unmask the sequence track.
     protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=8, temperature=0.7))
