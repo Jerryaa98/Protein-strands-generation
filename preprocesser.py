@@ -46,6 +46,7 @@ def get_strands(ss_file):
 
     # grouping
     strands = []
+    print(ss_file)
     current_strand = [residue_indcies[0]]
     for residue in residue_indcies[1:] :
         if residue == current_strand[-1] + 1:
@@ -57,6 +58,8 @@ def get_strands(ss_file):
     return strands
 
 def run(args):
+
+    print("Starting Preprocessing ...")
 
     data_file = args.data_file
     load_pdb = args.load_pdb
@@ -77,11 +80,14 @@ def run(args):
             raise ValueError(f"Error creating directory '{ss_dir}': {e}")
 
     if(load_pdb):
+        print("Downloading PDB files from ECOD database ...")
         load_pdb_files(data_file, pdb_dir)
+        print(f"Finished Downloading PDB files to {pdb_dir}")
 
     ids = os.listdir(pdb_dir)
     faulty_ids = []
 
+    print("Running stride on PDB files to get secondary structure ...")
     for id in ids:
         id = id.split('.')[0]
         ss_output_file = f"{ss_dir}/{id}.txt"
@@ -97,25 +103,25 @@ def run(args):
         except subprocess.CalledProcessError as e:
             faulty_ids.append(id)
             print(f"Error executing stride: {e}")
-    # print(faulty_ids)
+    print(f"Finished running stride, saved secondary structure files to {ss_dir}")
 
     # Save faulty IDs to a JSON file
     if(args.save_faulty_ids == True):
         fault_file = f"{work_dir}/faulty_ids.json"
+        print("Saving faulty PDB files ...")
         try:
             with open(fault_file, 'w') as json_file:
                 json.dump(faulty_ids, json_file, indent=4)
             print(f"Faulty IDs saved to {fault_file}")
         except Exception as e:
             print(f"Error saving faulty IDs: {e}")
-
-
-
+        print(f"Saved faulty IDs at {fault_file}")
 
     # save meta/data in json file
+    print("Saving Meta data ...")
     data = {}
     with open(data_file, "r") as file:
-        print(data_file)
+        # print(data_file)
         reader = csv.reader(file)
         i = -1
         for row in reader:
@@ -135,6 +141,9 @@ def run(args):
 
     with open(f'{work_dir}/strands.json','w') as json_file:
         json.dump(data, json_file)
+
+    print(f"Saved strands to {work_dir}/strands.json")
+    print("Finished Preprocessing !")
 
 if __name__ == "__main__":
     # Create an ArgumentParser object

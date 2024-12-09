@@ -24,6 +24,7 @@ __pycache__/
 *.h5
 *.hdf5
 *.mat
+*.json
 
 # Model checkpoints and logs
 **/*.ckpt
@@ -54,3 +55,7 @@ Desktop.ini
 
 # frameworks
 stride/
+generated_sequences/
+pdb_files/
+ss_files/
+
