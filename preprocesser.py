@@ -6,6 +6,9 @@ import numpy as np
 import json 
 import time
 import subprocess
+from tqdm import tqdm
+
+
 # ECOD ss download link : http://prodata.swmed.edu/ecod/af2_pdb/structure?id=e2iahA3
 def load_pdb_files(data_file, output_dir):
     
@@ -19,7 +22,7 @@ def load_pdb_files(data_file, output_dir):
     #skip header
     ids = ids[1:]
 
-    for id in ids:
+    for id in tqdm(ids):
         # URL of the file
 
         url = f"http://prodata.swmed.edu/ecod/af2_pdb/structure?id={id}"
@@ -88,7 +91,7 @@ def run(args):
     faulty_ids = []
 
     print("Running stride on PDB files to get secondary structure ...")
-    for id in ids:
+    for id in tqdm(ids):
         id = id.split('.')[0]
         ss_output_file = f"{ss_dir}/{id}.txt"
         
@@ -107,7 +110,7 @@ def run(args):
 
     # Save faulty IDs to a JSON file
     if(args.save_faulty_ids == True):
-        fault_file = f"{work_dir}/faulty_ids.json"
+        fault_file = f"{work_dir}/data/faulty_ids.json"
         print("Saving faulty PDB files ...")
         try:
             with open(fault_file, 'w') as json_file:
@@ -139,7 +142,7 @@ def run(args):
             state = {'seq': seq, 'strands':strands}
             data[id] = state
 
-    with open(f'{work_dir}/strands.json','w') as json_file:
+    with open(f'{work_dir}/data/strands.json','w') as json_file:
         json.dump(data, json_file)
 
     print(f"Saved strands to {work_dir}/strands.json")
@@ -148,7 +151,7 @@ if __name__ == "__main__":
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description="Strands Generation")
     # Add arguments
-    parser.add_argument("--data_file", type=str, default='./OMBB_data.csv', help="path for the dataset")
+    parser.add_argument("--data_file", type=str, default='./data/OMBB_data.csv', help="path for the dataset")
     parser.add_argument("--load_pdb", type=bool, default=False, help='load pdp file using wget or not')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--save_faulty_ids", type=bool, default=False, help='save faulty pdb file ids in a json file')

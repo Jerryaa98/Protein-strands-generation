@@ -1,8 +1,0 @@
-1. Download stride from : https://webclu.bio.wzw.tum.de/stride/ (should be tar file)
-2. mkdir stride & cp stride.tar to stride
-3. tar -xvf stride.tar
-4. make
-5. (Change it) For stride to run from any where do : export PATH=$PATH:/users/amaalouf/mbarbara/Biology_project/stride
-6. source ~/.bashrc
-7. Test it 'stride input.pdb -o' (ss only) 
-8. see stride -h for more information

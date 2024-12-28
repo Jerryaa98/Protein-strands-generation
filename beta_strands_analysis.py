@@ -18,7 +18,7 @@ def run(args):
     plt.bar(uniqe_lens, counts, color='skyblue', edgecolor='black')
     plt.xlabel('Beta Strand length')
     plt.ylabel('Frequency')
-    plt.savefig(f'{work_dir}/BetaStrandLength.png')
+    plt.savefig(f'{work_dir}/images/BetaStrandLength.png')
 
 
 
@@ -27,6 +27,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Strands Generation")
     # Add arguments
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
-    parser.add_argument("--strands_file", type=str)
+    parser.add_argument("--strands_file", type=str, default='/root/Biology_project/data/strands.json')
     args = parser.parse_args()
     run(args)

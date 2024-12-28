@@ -5,7 +5,8 @@ from Bio.Align import substitution_matrices
 from Bio.PDB import PDBParser, Superimposer
 import numpy as np
 import os
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def calculate_seq_similarity(seq1, seq2, matrix = substitution_matrices.load('BLOSUM62')):
     if len(seq1) != len(seq2):

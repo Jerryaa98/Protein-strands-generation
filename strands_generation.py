@@ -9,6 +9,8 @@ from Bio.PDB import PDBParser
 from Bio.PDB.DSSP import DSSP
 import os
 
+from tqdm import tqdm
+
 
 def run(args):
     # Will instruct you how to get an API key from huggingface hub, make one with "Read" permission.
@@ -31,6 +33,7 @@ def run(args):
     with open(strands_file, 'r') as json_file:
         data = json.load(json_file)
 
+    print('Starting Strand Generation ...')
     generated_data = {}
     for id in data.keys():
         seq = data[id]['seq']
@@ -70,6 +73,8 @@ def run(args):
 
     with open(f'{generated_sequences_dir}/seq.json','w') as json_file:
         json.dump(generated_data, json_file, indent=4)
+    
+    print('Finished Strand Generation !')
 
 
 if __name__ == "__main__":
@@ -77,7 +82,7 @@ if __name__ == "__main__":
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description="Strands Generation")
     # Add arguments
-    parser.add_argument("--strands_file", type=str, help='strands file json file')
+    parser.add_argument("--strands_file", type=str, default='/root/Biology_project/data/strands.json', help='strands file json file')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--hf_token", type=str, default="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")
     parser.add_argument("--MIN_STRAND_LEN",type=int,default=5)
