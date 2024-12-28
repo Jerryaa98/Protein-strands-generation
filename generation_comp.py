@@ -64,7 +64,8 @@ def calculate_rmsd(pdb_file1, pdb_file2):
     ca_atoms2 = get_ca_atoms_single_chain(structure2)
     
     if len(ca_atoms1) != len(ca_atoms2):
-        raise ValueError("Structures have different numbers of Cα atoms.")
+        print("Structures have different numbers of Cα atoms, skipping this one")
+        return
     
     # Superimpose the structures
     super_imposer = Superimposer()
@@ -105,6 +106,7 @@ def plot_results(results_dir, id, sequences_identity, sequences_similarity, ss_s
     axes[2].set_title(id)
 
     plt.savefig(f'{results_dir}/{id}.png')
+    plt.close()
     return 
 
 def run(args):
@@ -119,7 +121,7 @@ def run(args):
     with open(sequences_file,'r') as json_file:
         seq_data = json.load(json_file)
 
-    for id in seq_data.keys():
+    for id in tqdm(seq_data.keys()):
         generated_sequences = seq_data[id]
         sequences_identity, sequences_similarity = plot_seq_comp(generated_sequences)
         generated_sequences_id_dir = f'{generated_sequences_dir}/{id}' 
