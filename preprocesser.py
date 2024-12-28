@@ -144,7 +144,6 @@ def run(args):
 
     print(f"Saved strands to {work_dir}/strands.json")
     print("Finished Preprocessing !")
-
 if __name__ == "__main__":
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description="Strands Generation")

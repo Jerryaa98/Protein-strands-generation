@@ -17,6 +17,10 @@ def run(args):
     strands_file = args.strands_file
     work_dir = args.work_dir
 
+    MIN_STRAND_LEN = args.MIN_STRAND_LEN
+    MAX_STRAND_LEN = args.MAX_STRAND_LEN
+
+
     generated_sequences_dir = f"{work_dir}/generated_sequences"
     if not os.path.exists(generated_sequences_dir):
         try:
@@ -31,11 +35,13 @@ def run(args):
     for id in data.keys():
         seq = data[id]['seq']
         strands_indcies = data[id]['strands']
-        state = []
+        state = [seq]
         for i,strand in enumerate(strands_indcies):
+            if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
+                continue
             # mask
             masked_seq = ""
-            for j, r in enumerate(seq):
+            for j, r in enumerate(state[-1]):
                 if j+1 in strand:
                     masked_seq += '_'
                 else:
@@ -63,7 +69,7 @@ def run(args):
         generated_data[id] = state
 
     with open(f'{generated_sequences_dir}/seq.json','w') as json_file:
-        json.dump(generated_data, json_file)
+        json.dump(generated_data, json_file, indent=4)
 
 
 if __name__ == "__main__":
@@ -74,5 +80,7 @@ if __name__ == "__main__":
     parser.add_argument("--strands_file", type=str, help='strands file json file')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--hf_token", type=str, default="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")
+    parser.add_argument("--MIN_STRAND_LEN",type=int,default=5)
+    parser.add_argument("--MAX_STRAND_LEN",type=int,default=25)
     args = parser.parse_args()
     run(args)
