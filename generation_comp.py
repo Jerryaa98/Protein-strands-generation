@@ -89,7 +89,7 @@ def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
 def plot_results(results_dir, id, sequences_identity, sequences_similarity, ss_similarity):
     x = range(1,len(sequences_similarity)+1)
 
-    fig, axes = plt.subplots(1,3, figsize=(15,9))
+    fig, axes = plt.subplots(1,3, figsize=(20,11))
     axes[0].plot(x, sequences_identity)
     axes[0].set_xlabel('Iteration Num')
     axes[0].set_ylabel('Sequence Identity (%)')

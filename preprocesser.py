@@ -151,7 +151,7 @@ if __name__ == "__main__":
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description="Strands Generation")
     # Add arguments
-    parser.add_argument("--data_file", type=str, default='./data/OMBB_data.csv', help="path for the dataset")
+    parser.add_argument("--data_file", type=str, default='/root/Biology_project/data/OMBB_data.csv', help="path for the dataset")
     parser.add_argument("--load_pdb", type=bool, default=False, help='load pdp file using wget or not')
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--save_faulty_ids", type=bool, default=False, help='save faulty pdb file ids in a json file')

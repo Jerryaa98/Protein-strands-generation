@@ -35,7 +35,7 @@ def run(args):
 
     print('Starting Strand Generation ...')
     generated_data = {}
-    for id in data.keys():
+    for id in tqdm(data.keys()):
         seq = data[id]['seq']
         strands_indcies = data[id]['strands']
         state = [seq]
