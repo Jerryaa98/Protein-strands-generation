@@ -27,6 +27,13 @@ git clone https://github.com/Jerryaa98/Protein-strands-generation.git
 cd Protein-strands-generation
 ```
 
+Filter Outliers:
+
+We removed all strands of  25 < length or 5 > length bsed on the strands length distribution below
+
+
+![BetaStrandLength.png](images/BetaStrandLength.png)
+
 ## Step 2
 
 install all the protein data files (pdb) from the ECOD database and preprocess the data using this python script
@@ -47,3 +54,18 @@ python strands_generation.py
 ```
 
 by the end, there should be a general folder for each protein such that it has all the generated sequences for it as new pdb files.
+
+## Step 4
+
+Compare the newly generated strands with the general space of known sequences using three metrics.
+
+- Structrual Similarity (SVD)
+- Sequence Identity (Percentage %)
+- Sequence Similarity (Blosum Matrix)
+  
+```bash
+python generation_comp.py
+```
+
+Example:
+![e1af6A1.png](results/e1af6A1.png)
