@@ -115,7 +115,7 @@ def run(args):
     strategy = args.strategy
     generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}"
     sequences_file = f'{generated_sequences_dir}/seq.json'
-    results_dir = f'{work_dir}/{strategy}_comparison'
+    results_dir = f'{work_dir}/comparison_results/{strategy}_comparison'
 
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
