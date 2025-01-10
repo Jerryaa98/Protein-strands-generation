@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import random 
+import itertools 
 
 class StrandLoader():
     def __init__(self, data):
@@ -43,24 +44,6 @@ class ReverseStrandLoader(StrandLoader):
         else:
             raise StopIteration
            
-class PermutationsStrandLoader(StrandLoader):
-    def __init__(self, data, seed):
-        super().__init__(data)
-        self.seed = seed
-        
-
-    def __iter__(self):
-        random.seed(self.seed)
-        self.permutations = np.random.permutation(len(self.data))
-        self.iter_index = 0
-        return self
-    
-    def __next__(self):
-        if self.iter_index < len(self.permutations):
-            item = self.data[self.permutations[self.iter_index]]
-            self.iter_index += 1
-            return item
-
 class RandomStrandLoader(StrandLoader):
     def __init__(self, data, seed):
         super().__init__(data)

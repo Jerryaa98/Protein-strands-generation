@@ -117,12 +117,14 @@ def run(args):
     sequences_file = f'{generated_sequences_dir}/seq.json'
     results_dir = f'{work_dir}/comparison_results/{strategy}_comparison'
 
+    
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
     with open(sequences_file,'r') as json_file:
         seq_data = json.load(json_file)
 
+    print('Starting generation comparsion ...')
     for id in tqdm(seq_data.keys()):
         generated_sequences = seq_data[id]
         sequences_identity, sequences_similarity = plot_seq_comp(generated_sequences)
@@ -131,6 +133,7 @@ def run(args):
 
         plot_results(results_dir, strategy, id, sequences_identity, sequences_similarity, ss_similarity)
 
+    print('Done Comparing')
     
 if __name__ == "__main__":
      # Create an ArgumentParser object
@@ -138,6 +141,6 @@ if __name__ == "__main__":
     # Add arguments
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--strategy",type=str,
-                        choices=['sequential', 'permutations', 'reverse', 'random'])    
+                        choices=['sequential', 'reverse', 'random'])    
     args = parser.parse_args()
     run(args)

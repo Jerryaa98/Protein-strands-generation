@@ -63,7 +63,7 @@ def run(args):
         state = [seq]
         
         strand_loader = init_loader(strategy, strands_indcies, seed)
-
+        print(0)
         for i, strand in enumerate(strand_loader):
             if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
                 continue
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed",type=int,default=42)
     parser.add_argument("--temperature",type=float,default=0.7)
     parser.add_argument("--strategy",type=str,
-                        choices=['sequential', 'permutations', 'reverse', 'random'],
+                        choices=['sequential', 'reverse', 'random'],
                         default='sequential')
     args = parser.parse_args()
     run(args)
