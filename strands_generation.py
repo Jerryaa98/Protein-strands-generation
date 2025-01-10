@@ -10,7 +10,25 @@ from Bio.PDB.DSSP import DSSP
 import os
 
 from tqdm import tqdm
+from strandsloader import SequentialStrandLoader, PermutationsStrandLoader, ReverseStrandLoader, RandomStrandLoader
 
+
+def init_loader(strategy, data, seed):
+    
+    if strategy == 'sequential':
+        return SequentialStrandLoader(data)
+
+    elif strategy == 'reverse':
+        return ReverseStrandLoader(data)
+    
+    elif strategy == 'permutations' :
+        return PermutationsStrandLoader(data, seed)
+    
+    elif strategy == 'random':
+        return RandomStrandLoader(data, seed)
+    
+    else :
+        raise ValueError('Strategy not supported!')
 
 def run(args):
     # Will instruct you how to get an API key from huggingface hub, make one with "Read" permission.
@@ -18,18 +36,22 @@ def run(args):
     model: ESM3InferenceClient = ESM3.from_pretrained("esm3-open").to("cuda") 
     strands_file = args.strands_file
     work_dir = args.work_dir
+    strategy = args.strategy
+    seed = args.seed
 
     MIN_STRAND_LEN = args.MIN_STRAND_LEN
     MAX_STRAND_LEN = args.MAX_STRAND_LEN
 
 
-    generated_sequences_dir = f"{work_dir}/generated_sequences"
+    generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}"
     if not os.path.exists(generated_sequences_dir):
         try:
             os.makedirs(generated_sequences_dir)  # Create the directory
         except Exception as e:
             raise ValueError(f"Error creating directory '{generated_sequences_dir}': {e}")
-        
+
+
+
     with open(strands_file, 'r') as json_file:
         data = json.load(json_file)
 
@@ -39,7 +61,10 @@ def run(args):
         seq = data[id]['seq']
         strands_indcies = data[id]['strands']
         state = [seq]
-        for i,strand in enumerate(strands_indcies):
+        
+        strand_loader = init_loader(strategy, strands_indcies, seed)
+
+        for i, strand in enumerate(strand_loader):
             if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
                 continue
             # mask
@@ -54,7 +79,7 @@ def run(args):
 
             # Generate and save seq
             num_steps = max(1, len(strand)//2)
-            protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=0.7))
+            protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=args.temperature))
             output_seq = protein.sequence
             state.append(output_seq)
             # Generate and save pdb files 
@@ -87,5 +112,10 @@ if __name__ == "__main__":
     parser.add_argument("--hf_token", type=str, default="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")
     parser.add_argument("--MIN_STRAND_LEN",type=int,default=5)
     parser.add_argument("--MAX_STRAND_LEN",type=int,default=25)
+    parser.add_argument("--seed",type=int,default=42)
+    parser.add_argument("--temperature",type=float,default=0.7)
+    parser.add_argument("--strategy",type=str,
+                        choices=['sequential', 'permutations', 'reverse', 'random'],
+                        default='sequential')
     args = parser.parse_args()
     run(args)

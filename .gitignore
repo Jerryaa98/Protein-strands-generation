@@ -58,4 +58,5 @@ stride/
 generated_sequences/
 pdb_files/
 ss_files/
+logs_and_scripts/
 
