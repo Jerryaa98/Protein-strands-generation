@@ -16,7 +16,6 @@ import random
 import torch
 
 def init_loader(strategy, data, seed):
-    
     if strategy == 'sequential':
         return SequentialStrandLoader(data)
 
@@ -52,7 +51,6 @@ def analyze_seeds(args, param_range):
     with open(strands_file, 'r') as json_file:
         data = json.load(json_file)
 
-    seq_ids = [args.seq_ids]
 
     print('Analyzing the afficet of different seed on the generation')
     print('Starting Strand Generation ...')
@@ -72,7 +70,7 @@ def analyze_seeds(args, param_range):
             except Exception as e:
                 raise ValueError(f"Error creating directory '{curr_generated_sequences_dir}': {e}")
         
-        for id in tqdm(seq_ids):
+        for id in tqdm(data.keys()):
             seq = data[id]['seq']
             strands_indcies = data[id]['strands']
             state = [seq]
@@ -139,8 +137,6 @@ def analyze_temperature(args, param_range):
     with open(strands_file, 'r') as json_file:
         data = json.load(json_file)
 
-    seq_ids = [args.seq_ids]
-
     print('Analyzing the afficet of different temperature on the generation')
     print('Starting Strand Generation ...')
 
@@ -160,7 +156,7 @@ def analyze_temperature(args, param_range):
             except Exception as e:
                 raise ValueError(f"Error creating directory '{curr_generated_sequences_dir}': {e}")
         
-        for id in tqdm(seq_ids):
+        for id in tqdm(data.keys()):
             seq = data[id]['seq']
             strands_indcies = data[id]['strands']
             state = [seq]
@@ -245,6 +241,5 @@ if __name__ == "__main__":
     parser.add_argument("--param", type=str,
                         choices=['seed', 'temperature'],
                         default='seed')
-    parser.add_argument("--seq_ids", type=str)
     args = parser.parse_args()
     run(args)
