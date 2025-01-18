@@ -12,26 +12,21 @@ def calculate_seq_similarity(seq1, seq2, matrix = substitution_matrices.load('BL
     if len(seq1) != len(seq2):
         raise ValueError("Sequences must be of the same length for this method.")
     
-    similarity_score = 0
+ 
     valid_pairs = 0
-
     # Iterate through the sequence pairs
     for res1, res2 in zip(seq1, seq2):
         pair = (res1, res2)
         reverse_pair = (res2, res1)  # For cases where the matrix is symmetric
 
         # Check if the pair exists in the substitution matrix
-        if pair in matrix and matrix[pair] >= 0:
-            similarity_score += matrix[pair]
+        if pair in matrix and matrix[pair] > 0:
             valid_pairs += 1
-        elif reverse_pair in matrix and matrix[pair] >= 0:
-            similarity_score += matrix[reverse_pair]
+        elif reverse_pair in matrix and matrix[pair] > 0:
             valid_pairs += 1
     
     # Normalize the similarity score by the length of the sequence
-    if valid_pairs == 0:
-        return 0  # Avoid division by zero
-    normalized_similarity = similarity_score / valid_pairs
+    normalized_similarity = valid_pairs / len(seq1)
     return normalized_similarity
 
 def calculate_seq_identity(seq1, seq2):
@@ -51,6 +46,7 @@ def plot_seq_comp(generated_sequences):
     return sequences_identity, sequences_similarity
 
 def calculate_rmsd(pdb_file1, pdb_file2):
+
     parser = PDBParser(QUIET=True)
     structure1 = parser.get_structure("struct1", pdb_file1)
     structure2 = parser.get_structure("struct2", pdb_file2)
@@ -59,8 +55,9 @@ def calculate_rmsd(pdb_file1, pdb_file2):
     def get_ca_atoms_single_chain(structure):
         model = next(structure.get_models())  # Get the first model
         chain = next(model.get_chains())  # Get the first chain
+        
         return [residue['CA'] for residue in chain if 'CA' in residue]
-
+    
     ca_atoms1 = get_ca_atoms_single_chain(structure1)
     ca_atoms2 = get_ca_atoms_single_chain(structure2)
     
@@ -76,6 +73,10 @@ def calculate_rmsd(pdb_file1, pdb_file2):
     # Calculate RMSD
     rmsd = super_imposer.rms
     return rmsd
+
+
+
+#e2f1vA1
 
 def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
     generated_pdb_file = sorted(os.listdir(generated_sequences_id_dir))
@@ -98,13 +99,13 @@ def plot_results(results_dir, strategy, id, sequences_identity, sequences_simila
 
     axes[1].plot(x, sequences_similarity)
     axes[1].set_xlabel('Iteration Num')
-    axes[1].set_ylabel('Sequence Similarity (norm)')
-    axes[0].set_title(f'{strategy}_{id}')
+    axes[1].set_ylabel('Sequence Similarity (%)')
+    axes[1].set_title(f'{strategy}_{id}')
 
     axes[2].plot(x, ss_similarity)
     axes[2].set_xlabel('Iteration Num')
     axes[2].set_ylabel('Structural similarity')
-    axes[0].set_title(f'{strategy}_{id}')
+    axes[2].set_title(f'{strategy}_{id}')
 
     plt.savefig(f'{results_dir}/{id}.png')
     plt.close()
@@ -132,6 +133,7 @@ def run(args):
         ss_similarity = plot_ss_comp(id, work_dir, generated_sequences_id_dir)
 
         plot_results(results_dir, strategy, id, sequences_identity, sequences_similarity, ss_similarity)
+
 
     print('Done Comparing')
     
