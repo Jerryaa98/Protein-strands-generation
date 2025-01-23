@@ -56,6 +56,7 @@ def run(args):
     print('Starting Strand Generation ...')
     generated_data = {}
     for id in tqdm(data.keys()):
+
         seq = data[id]['seq']
         strands_indcies = data[id]['strands']
         state = [seq]
@@ -76,13 +77,13 @@ def run(args):
             protein = ESMProtein(sequence=masked_seq)
 
             # Generate and save seq
-            num_steps = 100
+            num_steps = 1000
 
             protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=args.temperature))
             output_seq = protein.sequence
             state.append(output_seq)
             # Generate and save pdb files 
-            protein = model.generate(protein, GenerationConfig(track="structure", num_steps=num_steps))
+            protein = model.generate(protein, GenerationConfig(track="structure", num_steps=num_steps, temperature=args.temperature))
             generated_sequences = f"{generated_sequences_dir}/{id}"
             # generated seq after each masking foreach seq (id)
             if not os.path.exists(generated_sequences):
