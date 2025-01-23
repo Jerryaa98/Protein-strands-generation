@@ -7,7 +7,7 @@ import json
 import time
 import subprocess
 from tqdm import tqdm
-
+import re
 
 # ECOD ss download link : http://prodata.swmed.edu/ecod/af2_pdb/structure?id=e2iahA3
 def load_pdb_files(data_file, output_dir):
@@ -36,6 +36,31 @@ def load_pdb_files(data_file, output_dir):
             print(f"File saved as {output_file}")
         except Exception as e:
             print(f"Failed to download file: {e}")
+
+
+def filter_fualty_rows(pdb_path):
+    # Read the PDB file
+    with open(pdb_path, 'r') as file:
+        lines = file.readlines()
+
+    # Filter out lines where the 6th column (occupancy) is missing for ATOM/HETATM lines
+    filtered_lines = []
+    for line in lines:
+        # Check if the line starts with ATOM 
+        if line.startswith("ATOM"):
+            # Use regex to split by one or more spaces
+            columns = re.split(r'\s+', line.strip())
+            # Include the line if there are 11 or more columns
+            if len(columns) == 11:
+                filtered_lines.append(line)
+        else:
+            # Include all other lines (non-ATOM/HETATM)
+            filtered_lines.append(line)
+
+    # Write the filtered lines back to a new PDB file
+    with open(pdb_path, 'w') as output_file:
+        output_file.writelines(filtered_lines)
+
 
 def get_strands(ss_file):
     residue_indcies = []
@@ -103,9 +128,20 @@ def run(args):
             command = f"stride {pdb_dir}/{id}.pdb | grep '^ASG' >> {ss_output_file}"
             with open(ss_output_file, 'w') as output_file:
                 subprocess.run(command, shell=True, check=True)
+
         except subprocess.CalledProcessError as e:
-            faulty_ids.append(id)
-            print(f"Error executing stride: {e}")
+            print(id)
+            try:
+                filter_fualty_rows(f'{pdb_dir}/{id}.pdb')
+                # cliping the stands
+                command = f"stride {pdb_dir}/{id}.pdb | grep '^ASG' >> {ss_output_file}"
+                with open(ss_output_file, 'w') as output_file:
+                    subprocess.run(command, shell=True, check=True)
+
+            except subprocess.CalledProcessError as e:
+                faulty_ids.append(id)
+                print(f"Error executing stride: {e}")
+
     print(f"Finished running stride, saved secondary structure files to {ss_dir}")
 
     # Save faulty IDs to a JSON file

@@ -10,7 +10,7 @@ from Bio.PDB.DSSP import DSSP
 import os
 
 from tqdm import tqdm
-from strandsloader import SequentialStrandLoader, PermutationsStrandLoader, ReverseStrandLoader, RandomStrandLoader
+from strandsloader import SequentialStrandLoader, ReverseStrandLoader, RandomStrandLoader
 
 
 def init_loader(strategy, data, seed):
@@ -21,8 +21,6 @@ def init_loader(strategy, data, seed):
     elif strategy == 'reverse':
         return ReverseStrandLoader(data)
     
-    elif strategy == 'permutations' :
-        return PermutationsStrandLoader(data, seed)
     
     elif strategy == 'random':
         return RandomStrandLoader(data, seed)
@@ -58,12 +56,13 @@ def run(args):
     print('Starting Strand Generation ...')
     generated_data = {}
     for id in tqdm(data.keys()):
+
         seq = data[id]['seq']
         strands_indcies = data[id]['strands']
         state = [seq]
         
         strand_loader = init_loader(strategy, strands_indcies, seed)
-        print(0)
+        
         for i, strand in enumerate(strand_loader):
             if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
                 continue
@@ -78,12 +77,13 @@ def run(args):
             protein = ESMProtein(sequence=masked_seq)
 
             # Generate and save seq
-            num_steps = max(1, len(strand)//2)
+            num_steps = 1000
+
             protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=args.temperature))
             output_seq = protein.sequence
             state.append(output_seq)
             # Generate and save pdb files 
-            protein = model.generate(protein, GenerationConfig(track="structure", num_steps=num_steps))
+            protein = model.generate(protein, GenerationConfig(track="structure", num_steps=num_steps, temperature=args.temperature))
             generated_sequences = f"{generated_sequences_dir}/{id}"
             # generated seq after each masking foreach seq (id)
             if not os.path.exists(generated_sequences):
