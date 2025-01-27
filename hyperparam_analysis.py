@@ -161,7 +161,7 @@ def analyze_temperature(args, param_range):
             strands_indcies = data[id]['strands']
             state = [seq]
             
-            strand_loader = init_loader(strategy, strands_indcies, seed)
+            strand_loader = init_loader(strategy, strands_indcies, seed, args.NxLoop)
             for i, strand in enumerate(strand_loader):
                 if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
                     continue
@@ -241,5 +241,7 @@ if __name__ == "__main__":
     parser.add_argument("--param", type=str,
                         choices=['seed', 'temperature'],
                         default='seed')
+    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein") 
+
     args = parser.parse_args()
     run(args)
