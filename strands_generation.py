@@ -79,7 +79,7 @@ def run(args):
             protein = ESMProtein(sequence=masked_seq)
 
             # Generate and save seq
-            num_steps = 1000
+            num_steps = max(1, len(seq)//2)
 
             protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=args.temperature))
             output_seq = protein.sequence
