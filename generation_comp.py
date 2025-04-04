@@ -46,7 +46,8 @@ def plot_seq_comp(generated_sequences):
     return sequences_identity, sequences_similarity
 
 def calculate_rmsd(pdb_file1, pdb_file2):
-
+    if not os.path.exists(pdb_file1) or not os.path.exists(pdb_file2):
+        return -1
     parser = PDBParser(QUIET=True)
     structure1 = parser.get_structure("struct1", pdb_file1)
     structure2 = parser.get_structure("struct2", pdb_file2)
@@ -78,9 +79,9 @@ def calculate_rmsd(pdb_file1, pdb_file2):
 
 #e2f1vA1
 
-def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
+def plot_ss_comp(id, work_dir, generated_sequences_id_dir, Base_pdb_dir):
     generated_pdb_file = sorted(os.listdir(generated_sequences_id_dir))
-    og_pdb_fil_path = f'{work_dir}/ESM_pdb_files/{id}.pdb'
+    og_pdb_fil_path = f'{work_dir}/{Base_pdb_dir}/{id}.pdb'
     pdb_file = [f'{generated_sequences_id_dir}/{f}' for f in generated_pdb_file]
     ss_similiarty = []
     for generated_pdb in pdb_file:
@@ -116,21 +117,22 @@ def run(args):
     strategy = args.strategy
     generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}_N{args.NxLoop}"
     sequences_file = f'{generated_sequences_dir}/seq.json'
-    results_dir = f'{work_dir}/comparison_results/ESM_{strategy}_N{args.NxLoop}_comparison'
-
+    results_dir = f'{work_dir}/comparison_results/ESM_{strategy}_N{args.NxLoop}_comparison_Alpha_Fold_based'
+    Base_pdb_dir = args.Base_pdb_dir
     
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
     with open(sequences_file,'r') as json_file:
         seq_data = json.load(json_file)
-
+        
     print('Starting generation comparsion ...')
     for id in tqdm(seq_data.keys()):
+        print(id)
         generated_sequences = seq_data[id]
         sequences_identity, sequences_similarity = plot_seq_comp(generated_sequences)
         generated_sequences_id_dir = f'{generated_sequences_dir}/{id}' 
-        ss_similarity = plot_ss_comp(id, work_dir, generated_sequences_id_dir)
+        ss_similarity = plot_ss_comp(id, work_dir, generated_sequences_id_dir, Base_pdb_dir)
 
         plot_results(results_dir, strategy, id, args.NxLoop, sequences_identity, sequences_similarity, ss_similarity)
 
@@ -144,6 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--strategy",type=str,
                         choices=['sequential', 'reverse', 'random'])
-    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein") 
+    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein")
+    parser.add_argument("--Base_pdb_dir", type=str, default='Alpha_Fold_model_0') 
     args = parser.parse_args()
     run(args)

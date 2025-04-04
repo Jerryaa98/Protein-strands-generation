@@ -37,7 +37,7 @@ def calculate_rmsd(pdb_file1, pdb_file2):
 if __name__ == "__main__":
     ECOD_PDB_dir = '/root/Biology_project/pdb_files'
     ESM_PDB_dir = '/root/Biology_project/ESM_pdb_files'
-    ALPHA_PDB_dir = '/root/Biology_project/Alpha_Fold_model_0'
+    ALPHA_PDB_dir = '/root/Biology_project/Alpha_Fold_model_4'
     database_file = "/root/Biology_project/data/OMBB_data.csv"
     comp_dict = {}
     with open(database_file, 'r') as file:
@@ -51,13 +51,10 @@ if __name__ == "__main__":
             if not os.path.exists(ALPHA_pdb_file):
                 print(seq_id)
                 continue
-            rmsd_alpha = calculate_rmsd(ESM_pdb_file, ALPHA_pdb_file)
+            rmsd_alpha = calculate_rmsd(ECOD_pdb_file, ALPHA_pdb_file)
             #rmsd_esm = calculate_rmsd(ECOD_pdb_file, ESM_pdb_file)
             #print(f'{seq_id} | ESM : {rmsd_esm} | ALPHA FOLD : {rmsd_alpha}')
             comp_dict[seq_id] = rmsd_alpha
-
-
-
 
 
     x = np.arange(len(comp_dict.keys()))  # X-axis positions
@@ -86,6 +83,6 @@ if __name__ == "__main__":
 
     # Show plot
     plt.tight_layout()
-    plt.savefig('/root/Biology_project/Protein-strands-generation/images/AlphaFold_ESM_COMP.png')
+    plt.savefig('/root/Biology_project/Protein-strands-generation/images/AlphaFold_ECOD_COMP_4.png')
     
 
