@@ -60,4 +60,9 @@ pdb_files/
 ss_files/
 logs_and_scripts/
 hyperparam_comp_results/
-
+alphafold_data/data
+alphafold_data/model_0
+alphafold_data/model_1
+alphafold_data/model_2
+alphafold_data/model_3
+alphafold_data/model_4
