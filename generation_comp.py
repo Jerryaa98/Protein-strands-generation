@@ -80,7 +80,7 @@ def calculate_rmsd(pdb_file1, pdb_file2):
 
 def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
     generated_pdb_file = sorted(os.listdir(generated_sequences_id_dir))
-    og_pdb_fil_path = f'{work_dir}/pdb_files/{id}.pdb'
+    og_pdb_fil_path = f'{work_dir}/ESM_pdb_files/{id}.pdb'
     pdb_file = [f'{generated_sequences_id_dir}/{f}' for f in generated_pdb_file]
     ss_similiarty = []
     for generated_pdb in pdb_file:
@@ -116,7 +116,7 @@ def run(args):
     strategy = args.strategy
     generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}_N{args.NxLoop}"
     sequences_file = f'{generated_sequences_dir}/seq.json'
-    results_dir = f'{work_dir}/comparison_results/{strategy}_N{args.NxLoop}_comparison'
+    results_dir = f'{work_dir}/comparison_results/ESM_{strategy}_N{args.NxLoop}_comparison'
 
     
     if not os.path.exists(results_dir):
