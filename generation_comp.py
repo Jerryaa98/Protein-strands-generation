@@ -80,7 +80,7 @@ def calculate_rmsd(pdb_file1, pdb_file2):
 
 def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
     generated_pdb_file = sorted(os.listdir(generated_sequences_id_dir))
-    og_pdb_fil_path = f'{work_dir}/pdb_files/{id}.pdb'
+    og_pdb_fil_path = f'{work_dir}/ESM_pdb_files/{id}.pdb'
     pdb_file = [f'{generated_sequences_id_dir}/{f}' for f in generated_pdb_file]
     ss_similiarty = []
     for generated_pdb in pdb_file:
@@ -88,24 +88,24 @@ def plot_ss_comp(id, work_dir, generated_sequences_id_dir):
 
     return ss_similiarty
 
-def plot_results(results_dir, strategy, id, sequences_identity, sequences_similarity, ss_similarity):
+def plot_results(results_dir, strategy, id, NxLoop, sequences_identity, sequences_similarity, ss_similarity):
     x = range(1,len(sequences_similarity)+1)
 
     fig, axes = plt.subplots(1,3, figsize=(20,11))
     axes[0].plot(x, sequences_identity)
     axes[0].set_xlabel('Iteration Num')
     axes[0].set_ylabel('Sequence Identity (%)')
-    axes[0].set_title(f'{strategy}_{id}')
+    axes[0].set_title(f'{strategy}_N{NxLoop}_{id}')
 
     axes[1].plot(x, sequences_similarity)
     axes[1].set_xlabel('Iteration Num')
     axes[1].set_ylabel('Sequence Similarity (%)')
-    axes[1].set_title(f'{strategy}_{id}')
+    axes[1].set_title(f'{strategy}_N{NxLoop}_{id}')
 
     axes[2].plot(x, ss_similarity)
     axes[2].set_xlabel('Iteration Num')
-    axes[2].set_ylabel('Structural similarity')
-    axes[2].set_title(f'{strategy}_{id}')
+    axes[2].set_ylabel('Structural similarity (Ca dist)')
+    axes[2].set_title(f'{strategy}_N{NxLoop}_{id}')
 
     plt.savefig(f'{results_dir}/{id}.png')
     plt.close()
@@ -114,9 +114,9 @@ def plot_results(results_dir, strategy, id, sequences_identity, sequences_simila
 def run(args):
     work_dir = args.work_dir
     strategy = args.strategy
-    generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}"
+    generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}_N{args.NxLoop}"
     sequences_file = f'{generated_sequences_dir}/seq.json'
-    results_dir = f'{work_dir}/comparison_results/{strategy}_comparison'
+    results_dir = f'{work_dir}/comparison_results/ESM_{strategy}_N{args.NxLoop}_comparison'
 
     
     if not os.path.exists(results_dir):
@@ -132,7 +132,7 @@ def run(args):
         generated_sequences_id_dir = f'{generated_sequences_dir}/{id}' 
         ss_similarity = plot_ss_comp(id, work_dir, generated_sequences_id_dir)
 
-        plot_results(results_dir, strategy, id, sequences_identity, sequences_similarity, ss_similarity)
+        plot_results(results_dir, strategy, id, args.NxLoop, sequences_identity, sequences_similarity, ss_similarity)
 
 
     print('Done Comparing')
@@ -143,6 +143,7 @@ if __name__ == "__main__":
     # Add arguments
     parser.add_argument("--work_dir", type=str, default='/root/Biology_project', help='dirctory to save pdb file in')
     parser.add_argument("--strategy",type=str,
-                        choices=['sequential', 'reverse', 'random'])    
+                        choices=['sequential', 'reverse', 'random'])
+    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein") 
     args = parser.parse_args()
     run(args)

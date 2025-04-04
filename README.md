@@ -85,3 +85,7 @@ python generation_comp.py
 
 - Reverse generation
 ![e1af6A1.png](comparison_results/reverse_comparison/e1af6A1.png)
+
+
+An example NxLoop strategy such that N = 10 :-
+![e1qj8A1.png](images/e1qj8A1.png)

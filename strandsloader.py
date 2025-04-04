@@ -8,13 +8,18 @@ class StrandLoader():
         self.data = data
         self.data_len = len(data)
 
+
     def __iter__(self):
         raise NotImplementedError("SubClass should implement this method .")
 
 class SequentialStrandLoader(StrandLoader):
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, data, nLoop):
+        new_data = []
+        for _ in range(nLoop):
+            new_data.extend(data)
+
+        super().__init__(new_data)
         self.index = 0
 
     def __iter__(self):
@@ -29,7 +34,10 @@ class SequentialStrandLoader(StrandLoader):
             raise StopIteration
 
 class ReverseStrandLoader(StrandLoader):
-    def __init__(self, data):
+    def __init__(self, data, nLoop):
+        new_data = []
+        for _ in range(nLoop):
+            new_data.extend(data)
         super().__init__(data)
         self.index = self.data_len - 1
     
@@ -45,9 +53,12 @@ class ReverseStrandLoader(StrandLoader):
             raise StopIteration
            
 class RandomStrandLoader(StrandLoader):
-    def __init__(self, data, seed):
-        super().__init__(data)
-        self.indices = list(range(len(data)))
+    def __init__(self, data, seed, nLoop):
+        new_data = []
+        for _ in range(nLoop):
+            new_data.extend(data)
+        super().__init__(new_data)
+        self.indices = list(range(len(new_data)))
         self.seed = seed
     
     def __iter__(self):

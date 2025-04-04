@@ -107,6 +107,8 @@ if __name__ == "__main__" :
     parser.add_argument("--param", type=str,
                         choices=['seed', 'temperature'],
                         default='seed')
+    
+    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein") 
     args = parser.parse_args()
     run(args)
 

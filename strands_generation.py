@@ -13,17 +13,17 @@ from tqdm import tqdm
 from strandsloader import SequentialStrandLoader, ReverseStrandLoader, RandomStrandLoader
 
 
-def init_loader(strategy, data, seed):
+def init_loader(strategy, data, seed, NxLoop):
     
     if strategy == 'sequential':
-        return SequentialStrandLoader(data)
+        return SequentialStrandLoader(data, NxLoop)
 
     elif strategy == 'reverse':
-        return ReverseStrandLoader(data)
+        return ReverseStrandLoader(data, NxLoop)
     
     
     elif strategy == 'random':
-        return RandomStrandLoader(data, seed)
+        return RandomStrandLoader(data, seed, NxLoop)
     
     else :
         raise ValueError('Strategy not supported!')
@@ -41,7 +41,7 @@ def run(args):
     MAX_STRAND_LEN = args.MAX_STRAND_LEN
 
 
-    generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}"
+    generated_sequences_dir = f"{work_dir}/generated_sequences/{strategy}_N{args.NxLoop}"
     if not os.path.exists(generated_sequences_dir):
         try:
             os.makedirs(generated_sequences_dir)  # Create the directory
@@ -61,12 +61,14 @@ def run(args):
         strands_indcies = data[id]['strands']
         state = [seq]
         
-        strand_loader = init_loader(strategy, strands_indcies, seed)
+        strand_loader = init_loader(strategy, strands_indcies, seed, args.NxLoop)
         
         for i, strand in enumerate(strand_loader):
+            
             if len(strand) < MIN_STRAND_LEN or len(strand) > MAX_STRAND_LEN:
                 continue
             # mask
+
             masked_seq = ""
             for j, r in enumerate(state[-1]):
                 if j+1 in strand:
@@ -77,7 +79,7 @@ def run(args):
             protein = ESMProtein(sequence=masked_seq)
 
             # Generate and save seq
-            num_steps = 1000
+            num_steps = max(1, len(seq)//2)
 
             protein = model.generate(protein, GenerationConfig(track="sequence", num_steps=num_steps, temperature=args.temperature))
             output_seq = protein.sequence
@@ -95,6 +97,7 @@ def run(args):
             protein.to_pdb(f"{generated_sequences}/generation{i}.pdb")
 
         generated_data[id] = state
+
 
     with open(f'{generated_sequences_dir}/seq.json','w') as json_file:
         json.dump(generated_data, json_file, indent=4)
@@ -117,5 +120,6 @@ if __name__ == "__main__":
     parser.add_argument("--strategy",type=str,
                         choices=['sequential', 'reverse', 'random'],
                         default='sequential')
+    parser.add_argument("--NxLoop", type=int, default=1, help="Number of (Loop) generatens per protein")
     args = parser.parse_args()
     run(args)
