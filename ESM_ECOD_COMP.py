@@ -37,9 +37,10 @@ def calculate_rmsd(pdb_file1, pdb_file2):
 if __name__ == "__main__":
     ECOD_PDB_dir = '/root/Biology_project/pdb_files'
     ESM_PDB_dir = '/root/Biology_project/ESM_pdb_files'
-    ALPHA_PDB_dir = '/root/Biology_project/Alpha_Fold_model_4'
+    ALPHA_PDB_dir = '/root/Biology_project/Alpha_Fold_model_0'
     database_file = "/root/Biology_project/data/OMBB_data.csv"
-    comp_dict = {}
+    comp_dict_esm = {}
+    comp_dict_alpha_fold = {}
     with open(database_file, 'r') as file:
         reader = csv.reader(file)
         next(reader)  # Skip the header
@@ -49,40 +50,48 @@ if __name__ == "__main__":
             ESM_pdb_file = f'{ESM_PDB_dir}/{seq_id}.pdb'
             ALPHA_pdb_file = f'{ALPHA_PDB_dir}/{seq_id}.pdb'
             if not os.path.exists(ALPHA_pdb_file):
-                print(seq_id)
-                continue
-            rmsd_alpha = calculate_rmsd(ECOD_pdb_file, ALPHA_pdb_file)
-            #rmsd_esm = calculate_rmsd(ECOD_pdb_file, ESM_pdb_file)
-            #print(f'{seq_id} | ESM : {rmsd_esm} | ALPHA FOLD : {rmsd_alpha}')
-            comp_dict[seq_id] = rmsd_alpha
+                rmsd_alpha_fold = -1
+            else:   
+                rmsd_alpha_fold = calculate_rmsd(ECOD_pdb_file, ALPHA_pdb_file)
+            if not os.path.exists(ESM_pdb_file):
+                rmsd_esm = -1
+            else:
+                rmsd_esm = calculate_rmsd(ECOD_pdb_file, ESM_pdb_file)
+            comp_dict_alpha_fold[seq_id] = rmsd_alpha_fold
+            comp_dict_esm[seq_id] = rmsd_esm
 
 
-    x = np.arange(len(comp_dict.keys()))  # X-axis positions
-    width = 0.4  # Width of bars
+    x = np.arange(len(comp_dict_esm.keys()))  # positions for Y-axis (sequence IDs)
+    width = 0.4  # width of the bars
 
-    # Compute mean and standard deviation
-    mean = np.mean([x for x in comp_dict.values() if x > -1])
-    
-    # Create figure and axis
-    fig, ax = plt.subplots(figsize=(16, 9))
+    # Prepare values
+    esm_values = list(comp_dict_esm.values())
+    alpha_fold_values = list(comp_dict_alpha_fold.values())
+    labels = list(comp_dict_esm.keys())
 
+    fig, ax = plt.subplots(figsize=(12, 16))  # taller figure for vertical sequence IDs
+    mean_esm = np.mean([x for x in comp_dict_esm.values() if x > -1])
+    mean_alpha_fold = np.mean([x for x in comp_dict_alpha_fold.values() if x > -1])
     # Add mean ± std as text inside the plot
-    mean_text = f"MEAN: {mean:.2f} "
-    ax.text(0.95, 0.05, mean_text, transform=ax.transAxes, fontsize=12,
+    mean_text = f"AVG RMSD (ESM): {mean_esm:.2f}\nAVG RMSD (AlphaFold): {mean_alpha_fold:.2f}\n"
+    ax.text(0.95, 0.05, mean_text, transform=ax.transAxes, fontsize=14,
             verticalalignment='bottom', horizontalalignment='right',
             bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
 
-    # Labels, title, and legend
-    bars1 = ax.bar(x - width/2, list(comp_dict.values()), width, label='RMSD', color='b', alpha=0.7)
-    ax.set_xlabel('Seq ID')
-    ax.set_ylabel('RMSD')
-    ax.set_title('Comparison of RMSD for Each Seq ID ')
-    ax.set_xticks(x)
-    ax.set_xticklabels(comp_dict.keys(), rotation=90, ha='right')
-    ax.legend()
+    # Plot horizontal bars, shift by width to avoid overlap
+    bars1 = ax.barh(x - width/2, esm_values, height=width, label='ESM RMSD', color='b', alpha=0.7)
+    bars2 = ax.barh(x + width/2, alpha_fold_values, height=width, label='AlphaFold RMSD', color='r', alpha=0.7)
 
-    # Show plot
+    # Labels, title, and legend
+    ax.set_xlabel('RMSD')
+    ax.set_ylabel('Seq ID')
+    ax.set_title('Comparison of RMSD for Each Seq ID')
+
+    ax.set_yticks(x)
+    ax.set_yticklabels(labels)
+
+    ax.legend()
     plt.tight_layout()
-    plt.savefig('/root/Biology_project/Protein-strands-generation/images/AlphaFold_ECOD_COMP_4.png')
+    plt.savefig('/root/Biology_project/Protein-strands-generation/images/COMP.png')
     
 
