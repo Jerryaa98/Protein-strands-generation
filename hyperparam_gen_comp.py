@@ -12,7 +12,7 @@ def calculate_seq_identity(seq1, seq2):
     return identity
 
 
-def plotHeapMap(results_dir, strategy, id, param, param_range, data, iter_num):
+def plotHeapMap(results_dir, strategy, NxLoop, id, param, param_range, data, iter_num):
     seq_comp = [[0]*len(data) for _ in data]
     for i, seq1 in enumerate(data):
         for j, seq2 in enumerate(data):
@@ -21,17 +21,17 @@ def plotHeapMap(results_dir, strategy, id, param, param_range, data, iter_num):
     # Create the heatmap
     seq_comp = np.array(seq_comp)
     plt.figure(figsize=(12, 10))
-    sns.heatmap(seq_comp, annot=False, cmap='coolwarm', cbar=True, xticklabels=param_range, yticklabels=param_range)
+    sns.heatmap(seq_comp, annot=False, cmap='Spectral', cbar=True, xticklabels=param_range, yticklabels=param_range, vmin=0, vmax=100)
     # Adjust the axis labels
     plt.xticks(rotation=45, ha="right", fontsize=8)  # Rotate x-axis labels
     plt.yticks(fontsize=8)  # Adjust font size for y-axis labels
     plt.xlabel('Seed')
     plt.ylabel('Seed')
     # Add a title
-    plt.title(f"Generated sequences in the {iter_num}th iteration comparsion using {strategy} strategy and different {param}s")
+    plt.title(f"Sequence Identity comparsion in the generated sequences in the {iter_num}th with different {param}s")
 
     # Save the figure
-    curr_dir = f"{results_dir}/{strategy}/{param}/{id}"
+    curr_dir = f"{results_dir}/{strategy}_N{NxLoop}/{param}/{id}"
     if not os.path.exists(curr_dir):
         try:
             os.makedirs(curr_dir)  # Create the directory
@@ -49,18 +49,19 @@ def run(args):
     strategy = args.strategy
     MIN_STRAND_LEN = args.MIN_STRAND_LEN
     MAX_STRAND_LEN = args.MAX_STRAND_LEN
-    gen_seq_ana_strategy_dir =  f'{gen_seq_ana_dir}/{strategy}'
-    param = args.param
+    NxLoop = args.NxLoop
+    gen_seq_ana_strategy_dir =  f'{gen_seq_ana_dir}/{strategy}_N{NxLoop}'
+    param = args.HyperParam
 
     param_range = []
     # generated randomly 
-    if args.param == 'seed' :
+    if param == 'seed' :
         param_range = [1055, 1491, 1779, 2152, 2280, 
                        2795, 3017, 3188, 3829, 4604, 
                        4762, 4772, 6507, 6600, 7631, 
                        7659, 8357, 8531, 8956, 9213]
         
-    elif args.param == 'temperature' :
+    elif param == 'temperature' :
         param_range = [ 0.01322636856325421, 0.04699817656041905, 0.07464317162580314, 0.12045644716760062, 
                         0.13916569878527563, 0.15008777501514126, 0.21204356514687728, 0.21947129622082506, 
                         0.3432534576778067, 0.38764365536787626, 0.3883917640946134, 0.3895152114525644, 
@@ -88,7 +89,7 @@ def run(args):
             for curr_param in param_range:
                 seq_ith_gen_with_param.append(generated_seq[curr_param][id][i])
             # save comparsion betweeen the generated sequences in the ith iteration between all params
-            plotHeapMap(results_dir, strategy, id, param, param_range, seq_ith_gen_with_param, i)
+            plotHeapMap(results_dir, strategy,NxLoop, id, param, param_range, seq_ith_gen_with_param, i)
 
     return 
 
@@ -104,7 +105,7 @@ if __name__ == "__main__" :
     parser.add_argument("--strategy",type=str,
                         choices=['sequential', 'reverse', 'random'],
                         default='sequential')
-    parser.add_argument("--param", type=str,
+    parser.add_argument("--HyperParam", type=str,
                         choices=['seed', 'temperature'],
                         default='seed')
     

@@ -27,7 +27,7 @@ def calculate_seq_similarity(seq1, seq2, matrix = substitution_matrices.load('BL
     
     # Normalize the similarity score by the length of the sequence
     normalized_similarity = valid_pairs / len(seq1)
-    return normalized_similarity
+    return normalized_similarity * 100
 
 def calculate_seq_identity(seq1, seq2):
     # Calculate identity
